@@ -1,6 +1,6 @@
 # Plano de Trabalho - CardioIA Fase 4 Cap 1
 
-**Assistente Cardiologico Virtual com Visao Computacional | Grupo 59**
+**Assistente Cardiologico Virtual com Visao Computacional | Grupo 72**
 
 Este documento divide a Fase 4 em etapas para os 5 integrantes, com dependencias explicitas. Leia primeiro a secao "Linha do tempo e dependencias" para saber o que bloqueia o que.
 
