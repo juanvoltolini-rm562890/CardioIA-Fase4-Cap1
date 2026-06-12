@@ -121,7 +121,7 @@ Em desenvolvimento (Etapas 2 e 3 do plano): notebook de fairness (`04_fairness.i
 
 ## Links para entrega
 
-- GitHub publico: `[PREENCHER apos publicacao]`
+- GitHub publico: <https://github.com/juanvoltolini-rm562890/CardioIA-Fase4-Cap1>
 - Notebooks no Colab: abrir os arquivos de `notebooks/` no Google Colab.
 - Link video YouTube nao listado (ate 3 minutos): `[PREENCHER na Etapa 4]`
 
