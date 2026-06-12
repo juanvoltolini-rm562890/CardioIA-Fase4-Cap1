@@ -1,0 +1,27 @@
+# Dados (baixados via kagglehub, nao versionados; manifestos em data/splits/ sao versionados)
+data/*
+!data/README.md
+!data/splits/
+
+# Modelos treinados (publicados via GitHub Release, ver models/README.md)
+models/*.keras
+models/*.h5
+models/*.weights.h5
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+.ipynb_checkpoints/
+
+# Node / Expo
+node_modules/
+.expo/
+dist/
+*.tgz
+
+# Sistema / IDE
+.DS_Store
+.vscode/
+.idea/
