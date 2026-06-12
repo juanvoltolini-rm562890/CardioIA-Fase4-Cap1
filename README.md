@@ -8,7 +8,7 @@
 
 **FIAP | Tecnologo em Inteligencia Artificial | Fase 4 | Capitulo 1**
 
-## Grupo 59
+## Grupo 72
 
 | Integrante | GitHub |
 |---|---|
