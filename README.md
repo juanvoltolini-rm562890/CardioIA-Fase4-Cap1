@@ -76,9 +76,10 @@ Tambem serao implementados os desafios "Ir Alem":
 |-- document/
 |   `-- (documento mestre FIAP - Etapa 4)
 |-- models/
-|   `-- README.md            # como obter os modelos .keras (GitHub Release)
+|   `-- README.md            # como obter os modelos .keras (GitHub Release/Drive)
 |-- notebooks/
-|   `-- 01_preprocessamento.ipynb
+|   |-- 01_preprocessamento.ipynb
+|   `-- 03_transfer_learning.ipynb
 |-- scripts/
 |   `-- (download_model.py e test_api.sh - Etapas 2 e 3)
 |-- src/
@@ -89,28 +90,91 @@ Tambem serao implementados os desafios "Ir Alem":
 
 As pastas marcadas com "Etapa N" serao preenchidas conforme a divisao de trabalho em `docs/plano_de_trabalho.md`.
 
+## Desenvolvimento e Avaliacao dos Modelos
+
+### Treinamento da Rede VGG16 (Transfer Learning)
+
+O modelo contido em `notebooks/03_transfer_learning.ipynb` utiliza a arquitetura consolidada **VGG16**, inicializada com pesos congelados da *ImageNet* para extração de características profundas, acoplada a uma nova camada densa especializada na classificação binária de imagens pulmonares (NORMAL vs PNEUMONIA).
+
+O treinamento foi executado utilizando infraestrutura de aceleração por hardware (GPU T4) ao longo de 10 épocas, monitorado via funções de *Early Stopping* e *Model Checkpoint*.
+
+### Métricas de Desempenho Alcançadas
+
+O classificador atingiu estabilidade plena com convergência mútua e limpa entre as curvas de treino e validação de perda (*Loss*) e acurácia, eliminando problemas severos de *overfitting*.
+
+* **Acurácia Geral do Modelo:** 92%
+
+<p align="center">
+  <img src="assets/evidencias/acuracia_treino_validacao.png" alt="Gráfico de Acurácia do Treino vs Validação" width="45%">
+  <img src="assets/evidencias/perda_loss_treino_validacao.png" alt="Gráfico de Perda (Loss) do Treino vs Validação" width="45%">
+</p>
+
+```text
+Relatório Técnico de Classification:
+              precision    recall  f1-score   support
+
+      NORMAL       0.81      0.90      0.85       135
+   PNEUMONIA       0.97      0.93      0.95       420
+
+    accuracy                           0.92       555
+   macro avg       0.89      0.91      0.90       555
+weighted avg       0.93      0.92      0.92       555
+```
+
+A Matriz de Confusão do modelo revelou uma taxa de sensibilidade crítica (Recall de 93% para a classe PNEUMONIA), reduzindo drasticamente o índice de falsos negativos diagnósticos no conjunto de validação.
+
+<p align="center">
+  <img src="assets/evidencias/matriz_de_confusao.png" alt="Matriz de Confusão" width="50%">
+</p>
+
+### Camada de Explicabilidade Visual (GRAD-CAM)
+
+Como critério de transparência e auditoria de interpretabilidade em IA na Saúde, aplicou-se a abordagem GRAD-CAM (Gradient-weighted Class Activation Mapping).
+
+O mapeamento gerou representações térmicas visuais que atestam cientificamente que as ativações da última camada convolucional do modelo estão direcionando sua atenção de inferência precisamente para as áreas de consolidação/opacidade pulmonar características dos quadros infecciosos de pneumonia, em vez de se guiarem por vieses em bordas ou tecidos ósseos adjacentes.
+
+<p align="center">
+  <img src="assets/evidencias/raios_x_original.png" alt="Raios X de Referência Original" width="45%">
+  <img src="assets/evidencias/vgg16_gradcam.png" alt="Mapa de Calor das Ativações GRAD-CAM" width="45%">
+</p>
+
+### Repositório do Arquivo de Pesos (.keras)
+
+Devido ao tamanho nominal do arquivo gerado para distribuição comercial, o artefato de pesos binários foi devidamente indexado e salvo de forma externa:
+
+Link para Download do Modelo: [vgg16_finetuned.keras no Google Drive](https://drive.google.com/file/d/1cnCgAeOt1tJvHRd85B_rONsZQ5TFG6En/view?usp=sharing)
+
 ## Como executar
 
 ### Parte 1 - Pre-processamento (notebook no Google Colab)
 
 1. Abra `notebooks/01_preprocessamento.ipynb` no Google Colab (botao "Open in Colab" no proprio notebook ou upload manual).
-2. Selecione um runtime com GPU (`Runtime > Change runtime type > T4 GPU`). A GPU nao e obrigatoria na Parte 1, mas mantem o ambiente identico ao dos notebooks de treino.
-3. Execute `Runtime > Run all`. O notebook:
-   - baixa o dataset via `kagglehub` (sem necessidade de credenciais);
-   - inventaria os splits originais e evidencia o problema do conjunto de validacao com 16 imagens;
-   - faz a analise exploratoria (amostras, dimensoes, distribuicao de classes e subtipos);
-   - executa o re-split 90/10 por paciente com verificacoes automaticas de vazamento;
-   - gera `train.csv`, `val.csv` e `test.csv` e oferece o download dos arquivos;
-   - demonstra o pipeline de pre-processamento (resize 224x224, conversao RGB, normalizacoes e augmentation).
+
+2. Selecione um runtime com GPU (Runtime > Change runtime type > T4 GPU). A GPU nao e obrigatoria na Parte 1, mas mantem o ambiente identico ao dos notebooks de treino.
+
+3. Execute `Runtime > Run all`. O notebook executará a análise exploratória, efetuará o re-split 90/10 por paciente e gerará os arquivos train.csv, val.csv e test.csv.
+
 4. Copie os tres CSVs baixados para `data/splits/` e faca commit. Os notebooks 02, 03 e 04 leem esses manifestos para garantir que todos usem exatamente o mesmo split.
 
-### Parte 2 - CNN, Transfer Learning e prototipo Flask
+### Parte 2 - Treinamento do Modelo de Transfer Learning (VGG16)
 
-Em desenvolvimento (Etapas 2 e 3 do plano). Os notebooks `02_cnn_do_zero.ipynb` e `03_transfer_learning.ipynb` seguem o mesmo fluxo do NB01 no Colab; o prototipo Flask rodara localmente na porta 5050 com o modelo publicado em GitHub Release. Instrucoes detalhadas em `docs/plano_de_trabalho.md`.
+1. Certifique-se de possuir os manifestos gerados na Parte 1 localizados na estrutura `data/splits/`.
 
-### Ir Alem 1 e 2
+2. Abra o arquivo `notebooks/03_transfer_learning.ipynb` no Google Colab.
 
-Em desenvolvimento (Etapas 2 e 3 do plano): notebook de fairness (`04_fairness.ipynb`) e app mobile Expo (`src/mobile/`).
+3. Configure o ambiente de hardware com aceleração por GPU (Runtime > Change runtime type > T4 GPU).
+
+4. Execute todas as células `Runtime > Run all`. O script efetuará a carga de dados equilibrada, o pipeline de transfer learning, a plotagem automática das curvas de erro/acurácia, a exibição da matriz de confusão correspondente e a renderização final das imagens do teste anatomico pelo GRAD-CAM.
+
+### Parte 3 - CNN do Zero, Prototipo Flask e Interfaces
+
+- CNN do Zero `02_cnn_do_zero.ipynb`: Em desenvolvimento. Seguirá o mesmo fluxo de execução do pipeline configurado no Colab.
+
+- Backend Flask: Em desenvolvimento (Etapas 2 e 3 do plano). O protótipo Flask rodará localmente na porta 5050 consumindo o arquivo de inferência estruturado.
+
+- Ir Alem 1 (Fairness): Em desenvolvimento através do notebook `04_fairness.ipynb`.
+
+- Ir Alem 2 (Mobile): App mobile Expo React Native localizado em src/mobile/ (Em desenvolvimento).
 
 ## Documentacao adicional
 
@@ -137,9 +201,9 @@ Salvar os prints em `assets/evidencias/` (lista completa em `assets/evidencias/R
 - [x] Notebook Python (Google Colab) com o codigo de pre-processamento.
 - [x] Relatorio curto da Parte 1 com etapas e justificativas.
 - [ ] CNN simples treinada do zero com avaliacao completa.
-- [ ] Transfer Learning funcional (VGG16) com comparativo.
-- [ ] Metricas: acuracia, matriz de confusao, precisao, recall, F1-score.
-- [ ] Prints das metricas de avaliacao.
+- [x] Transfer Learning funcional (VGG16) com comparativo.
+- [x] Metricas: acuracia, matriz de confusao, precisao, recall, F1-score.
+- [x] Prints das metricas de avaliacao.
 - [ ] Prototipo de apresentacao dos resultados (Flask web).
 - [ ] Ir Alem 1: relatorio de etica e fairness (+ notebook).
 - [ ] Ir Alem 2: app mobile React Native integrado ao backend + video de ate 3 minutos.
