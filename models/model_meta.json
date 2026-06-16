@@ -1,0 +1,7 @@
+{
+  "arquitetura": "VGG16",
+  "img_size": [224, 224],
+  "preprocess": "rescale_255",
+  "classes": ["NORMAL", "PNEUMONIA"],
+  "threshold": 0.5
+}

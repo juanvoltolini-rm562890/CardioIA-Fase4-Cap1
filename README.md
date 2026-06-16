@@ -170,7 +170,7 @@ Link para Download do Modelo: [vgg16_finetuned.keras no Google Drive](https://dr
 
 - CNN do Zero `02_cnn_do_zero.ipynb`: Em desenvolvimento. Seguirá o mesmo fluxo de execução do pipeline configurado no Colab.
 
-- Backend Flask: Em desenvolvimento (Etapas 2 e 3 do plano). O protótipo Flask rodará localmente na porta 5050 consumindo o arquivo de inferência estruturado.
+- Backend Flask: Concluído e totalmente funcional na branch `flask` (Passo 4). O protótipo Flask roda localmente na porta 5050 consumindo o modelo VGG16 treinado no Google Colab, oferecendo um painel web premium e endpoint REST `/api/predict` integrado para o app mobile.
 
 - Ir Alem 1 (Fairness): Em desenvolvimento através do notebook `04_fairness.ipynb`.
 
@@ -204,7 +204,7 @@ Salvar os prints em `assets/evidencias/` (lista completa em `assets/evidencias/R
 - [x] Transfer Learning funcional (VGG16) com comparativo.
 - [x] Metricas: acuracia, matriz de confusao, precisao, recall, F1-score.
 - [x] Prints das metricas de avaliacao.
-- [ ] Prototipo de apresentacao dos resultados (Flask web).
+- [x] Prototipo de apresentacao dos resultados (Flask web).
 - [ ] Ir Alem 1: relatorio de etica e fairness (+ notebook).
 - [ ] Ir Alem 2: app mobile React Native integrado ao backend + video de ate 3 minutos.
 - [ ] Documento mestre seguindo Template FIAP (`document/`).

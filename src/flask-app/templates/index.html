@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CardioIA - Assistente Cardiológico Virtual</title>
+    <!-- Google Fonts: Outfit -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --bg-color: #0b1120;
+            --card-bg: rgba(30, 41, 59, 0.7);
+            --border-color: rgba(255, 255, 255, 0.08);
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --primary-gradient: linear-gradient(135deg, #38bdf8 0%, #3b82f6 100%);
+            --normal-color: #10b981;
+            --normal-gradient: linear-gradient(135deg, #34d399 0%, #059669 100%);
+            --pneumonia-color: #f43f5e;
+            --pneumonia-gradient: linear-gradient(135deg, #fb7185 0%, #e11d48 100%);
+            --accent-glow: rgba(56, 189, 248, 0.15);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            overflow-x: hidden;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(59, 130, 246, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(244, 63, 94, 0.05) 0%, transparent 40%);
+            padding-bottom: 2rem;
+        }
+
+        /* Header Styling */
+        header {
+            width: 100%;
+            max-width: 1200px;
+            padding: 1.5rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 3rem;
+            backdrop-filter: blur(10px);
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .logo-icon {
+            font-size: 1.75rem;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 2px 8px rgba(56, 189, 248, 0.3));
+            animation: pulse-glow 2s infinite alternate;
+        }
+
+        .logo-text {
+            font-weight: 700;
+            font-size: 1.5rem;
+            letter-spacing: -0.025em;
+            background: linear-gradient(to right, #f8fafc, #cbd5e1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .logo-text span {
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .badge-academic {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 0.375rem;
+        }
+
+        .badge-academic i {
+            color: #38bdf8;
+        }
+
+        /* Main Container */
+        .container {
+            width: 90%;
+            max-width: 800px;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            padding: 2.5rem;
+            box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(20px);
+            position: relative;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--primary-gradient);
+        }
+
+        .intro-section {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .intro-section h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            letter-spacing: -0.02em;
+        }
+
+        .intro-section p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            max-width: 500px;
+            margin: 0 auto;
+            line-height: 1.5;
+        }
+
+        /* Form / Upload Drag-n-Drop Zone */
+        #upload-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .drop-zone {
+            width: 100%;
+            height: 250px;
+            border: 2px dashed rgba(56, 189, 248, 0.25);
+            border-radius: 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: rgba(30, 41, 59, 0.3);
+            position: relative;
+        }
+
+        .drop-zone:hover, .drop-zone.dragover {
+            border-color: #38bdf8;
+            background: rgba(56, 189, 248, 0.04);
+            box-shadow: 0 0 20px var(--accent-glow);
+        }
+
+        .drop-zone-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            padding: 2rem;
+            pointer-events: none;
+            transition: opacity 0.3s;
+        }
+
+        .upload-icon {
+            font-size: 3rem;
+            color: #38bdf8;
+            margin-bottom: 1rem;
+            transition: transform 0.3s ease;
+        }
+
+        .drop-zone:hover .upload-icon {
+            transform: translateY(-5px);
+        }
+
+        .drop-zone-text {
+            font-size: 1.1rem;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+
+        .drop-zone-subtext {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        #file-input {
+            display: none;
+        }
+
+        /* Preview State */
+        .preview-container {
+            display: none;
+            position: relative;
+            width: 100%;
+            max-height: 350px;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+        }
+
+        .preview-image {
+            width: 100%;
+            height: 100%;
+            max-height: 350px;
+            object-fit: contain;
+            background: #020617;
+            display: block;
+        }
+
+        .remove-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #f43f5e;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            backdrop-filter: blur(4px);
+        }
+
+        .remove-btn:hover {
+            background: #f43f5e;
+            color: white;
+            transform: scale(1.1);
+        }
+
+        /* Buttons styling */
+        .btn {
+            width: 100%;
+            padding: 1rem;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: var(--primary-gradient);
+            color: white;
+            box-shadow: 0 4px 14px rgba(59, 130, 246, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        /* Loading / Scanning Animations */
+        .loading-container {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 3rem 0;
+            text-align: center;
+        }
+
+        .scanner-visual {
+            position: relative;
+            width: 160px;
+            height: 160px;
+            border: 2px solid rgba(56, 189, 248, 0.2);
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: 2rem;
+            background: #020617;
+        }
+
+        .scanner-visual i {
+            font-size: 4rem;
+            color: rgba(56, 189, 248, 0.15);
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .scanner-line {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(to right, transparent, #38bdf8, transparent);
+            box-shadow: 0 0 10px #38bdf8;
+            animation: scan-loop 2.5s infinite linear;
+        }
+
+        .loading-text {
+            font-size: 1.1rem;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            animation: pulse-text 1.5s infinite ease-in-out;
+        }
+
+        .loading-subtext {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        /* Results Screen */
+        .results-container {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            gap: 2rem;
+            animation: fade-in-up 0.5s ease;
+        }
+
+        .result-image-panel {
+            width: 100%;
+            max-width: 400px;
+            border-radius: 16px;
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .result-image-panel img {
+            width: 100%;
+            max-height: 250px;
+            object-fit: contain;
+            background: #020617;
+            display: block;
+        }
+
+        .result-card {
+            width: 100%;
+            padding: 1.75rem;
+            border-radius: 16px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid transparent;
+        }
+
+        .result-card.NORMAL {
+            background: rgba(16, 185, 129, 0.05);
+            border-color: rgba(16, 185, 129, 0.2);
+            color: var(--normal-color);
+        }
+
+        .result-card.PNEUMONIA {
+            background: rgba(244, 63, 254, 0.05);
+            border-color: rgba(244, 63, 94, 0.2);
+            color: var(--pneumonia-color);
+        }
+
+        .result-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1.25rem;
+            border-radius: 9999px;
+            font-weight: 700;
+            font-size: 1.25rem;
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: white;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .result-card.NORMAL .result-badge {
+            background: var(--normal-gradient);
+        }
+
+        .result-card.PNEUMONIA .result-badge {
+            background: var(--pneumonia-gradient);
+        }
+
+        .result-confidence-container {
+            margin-top: 1.5rem;
+        }
+
+        .confidence-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+        }
+
+        .confidence-bar-bg {
+            width: 100%;
+            height: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 9999px;
+            overflow: hidden;
+        }
+
+        .confidence-bar-fill {
+            height: 100%;
+            border-radius: 9999px;
+            transition: width 1s ease-out;
+        }
+
+        .result-card.NORMAL .confidence-bar-fill {
+            background: var(--normal-gradient);
+        }
+
+        .result-card.PNEUMONIA .confidence-bar-fill {
+            background: var(--pneumonia-gradient);
+        }
+
+        .disclaimer-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1rem 1.25rem;
+            display: flex;
+            gap: 0.75rem;
+            align-items: flex-start;
+            text-align: left;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            line-height: 1.4;
+        }
+
+        .disclaimer-card i {
+            color: #f59e0b;
+            font-size: 1rem;
+            margin-top: 2px;
+        }
+
+        .mock-indicator {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: rgba(245, 158, 11, 0.15);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            color: #f59e0b;
+            font-size: 0.7rem;
+            font-weight: 600;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+        }
+
+        /* Animations keyframes */
+        @keyframes pulse-glow {
+            0% { filter: drop-shadow(0 2px 4px rgba(56, 189, 248, 0.2)); }
+            100% { filter: drop-shadow(0 2px 14px rgba(56, 189, 248, 0.5)); }
+        }
+
+        @keyframes scan-loop {
+            0% { top: 0; }
+            50% { top: 100%; }
+            100% { top: 0; }
+        }
+
+        @keyframes pulse-text {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+
+        @keyframes fade-in-up {
+            0% {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Footer styling */
+        footer {
+            margin-top: 3rem;
+            text-align: center;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        footer a {
+            color: #38bdf8;
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        /* Responsive adaptations */
+        @media (max-width: 640px) {
+            .container {
+                padding: 1.5rem;
+            }
+            .intro-section h1 {
+                font-size: 1.6rem;
+            }
+            header {
+                padding: 1rem;
+                margin-bottom: 1.5rem;
+            }
+            .logo-text {
+                font-size: 1.25rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo-container">
+            <i class="fa-solid fa-heart-pulse logo-icon"></i>
+            <span class="logo-text">Cardio<span>IA</span></span>
+        </div>
+        <div class="badge-academic">
+            <i class="fa-solid fa-graduation-cap"></i> Uso Acadêmico
+        </div>
+    </header>
+
+    <main class="container">
+        <!-- 1. INTRO & INPUT FORM -->
+        <div id="form-panel">
+            <div class="intro-section">
+                <h1>Classificador de Radiografia Pulmonar</h1>
+                <p>Faça o upload do raio-X de tórax para identificar a presença de sinais sugestivos de pneumonia.</p>
+            </div>
+
+            <form id="upload-form" method="POST" enctype="multipart/form-data">
+                <!-- Drop Zone area -->
+                <div class="drop-zone" id="drop-zone">
+                    <div class="drop-zone-content" id="drop-content">
+                        <i class="fa-solid fa-cloud-arrow-up upload-icon"></i>
+                        <div class="drop-zone-text">Arraste a imagem aqui ou clique para buscar</div>
+                        <div class="drop-zone-subtext">Arquivos aceitos: JPEG, JPG, PNG</div>
+                    </div>
+                    
+                    <div class="preview-container" id="preview-box">
+                        <img src="" id="img-preview" class="preview-image" alt="Visualização do Raio X">
+                        <button type="button" class="remove-btn" id="remove-img-btn" title="Remover imagem">
+                            <i class="fa-solid fa-trash-can"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <input type="file" name="image" id="file-input" accept="image/jpeg, image/jpg, image/png">
+                
+                <button type="submit" class="btn btn-primary" id="analyze-btn" disabled>
+                    <i class="fa-solid fa-circle-nodes"></i> Analisar Radiografia
+                </button>
+            </form>
+        </div>
+
+        <!-- 2. LOADING SCREEN -->
+        <div id="loading-panel" class="loading-container">
+            <div class="scanner-visual">
+                <i class="fa-solid fa-lungs"></i>
+                <div class="scanner-line"></div>
+            </div>
+            <div class="loading-text">Processando imagem...</div>
+            <div class="loading-subtext">Normalizando e executando inferência do modelo VGG16.</div>
+        </div>
+
+        <!-- 3. RESULTS SCREEN -->
+        <div id="results-panel" class="results-container">
+            <div class="intro-section" style="margin-bottom: 1rem;">
+                <h1>Resultado da Análise</h1>
+                <p>Predição gerada pelo classificador CardioIA baseada em visão computacional profunda.</p>
+            </div>
+
+            <div class="result-image-panel">
+                <img src="" id="result-img-view" alt="Raio X Analisado">
+            </div>
+
+            <div class="result-card" id="result-card-box">
+                <div class="mock-indicator" id="mock-badge" style="display:none;">Dados Simulados</div>
+                
+                <div class="result-badge" id="result-class-badge">
+                    <!-- Icon and Class text here -->
+                </div>
+                
+                <div class="result-confidence-container">
+                    <div class="confidence-labels">
+                        <span>Grau de Confiança</span>
+                        <span id="result-confidence-text">0.0%</span>
+                    </div>
+                    <div class="confidence-bar-bg">
+                        <div class="confidence-bar-fill" id="result-confidence-bar" style="width: 0%"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="disclaimer-card">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+                <div>
+                    <strong>Atenção:</strong> Esta análise é puramente informativa e gerada por um protótipo acadêmico de aprendizado de máquina. O resultado NÃO substitui um laudo radiológico ou o diagnóstico clínico feito por um profissional médico qualificado.
+                </div>
+            </div>
+
+            <button type="button" class="btn btn-secondary" id="new-analysis-btn">
+                <i class="fa-solid fa-rotate-left"></i> Analisar Outro Raio-X
+            </button>
+        </div>
+    </main>
+
+    <footer>
+        Desenvolvido pelo Grupo 72 &copy; 2026 FIAP. Projeto de Visão Computacional.
+    </footer>
+
+    <script>
+        const dropZone = document.getElementById('drop-zone');
+        const fileInput = document.getElementById('file-input');
+        const dropContent = document.getElementById('drop-content');
+        const previewBox = document.getElementById('preview-box');
+        const imgPreview = document.getElementById('img-preview');
+        const removeImgBtn = document.getElementById('remove-img-btn');
+        const analyzeBtn = document.getElementById('analyze-btn');
+        const uploadForm = document.getElementById('upload-form');
+        
+        // Panels
+        const formPanel = document.getElementById('form-panel');
+        const loadingPanel = document.getElementById('loading-panel');
+        const resultsPanel = document.getElementById('results-panel');
+        
+        // Result components
+        const resultImgView = document.getElementById('result-img-view');
+        const resultCardBox = document.getElementById('result-card-box');
+        const resultClassBadge = document.getElementById('result-class-badge');
+        const resultConfidenceText = document.getElementById('result-confidence-text');
+        const resultConfidenceBar = document.getElementById('result-confidence-bar');
+        const mockBadge = document.getElementById('mock-badge');
+        const newAnalysisBtn = document.getElementById('new-analysis-btn');
+
+        // Drag & Drop behaviors
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropZone.addEventListener(eventName, (e) => {
+                e.preventDefault();
+                dropZone.classList.add('dragover');
+            }, false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, (e) => {
+                e.preventDefault();
+                dropZone.classList.remove('dragover');
+            }, false);
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            if (files.length > 0) {
+                fileInput.files = files;
+                handleFiles(files[0]);
+            }
+        });
+
+        dropZone.addEventListener('click', () => {
+            fileInput.click();
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            if (fileInput.files.length > 0) {
+                handleFiles(fileInput.files[0]);
+            }
+        });
+
+        function handleFiles(file) {
+            if (!file.type.match('image.*')) {
+                alert('Por favor, selecione apenas arquivos de imagem!');
+                return;
+            }
+            
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onloadend = () => {
+                imgPreview.src = reader.result;
+                dropContent.style.display = 'none';
+                previewBox.style.display = 'block';
+                analyzeBtn.removeAttribute('disabled');
+            };
+        }
+
+        removeImgBtn.addEventListener('click', (e) => {
+            e.stopPropagation(); // Avoid triggering dropZone click
+            fileInput.value = '';
+            imgPreview.src = '';
+            previewBox.style.display = 'none';
+            dropContent.style.display = 'flex';
+            analyzeBtn.setAttribute('disabled', 'true');
+        });
+
+        // Submit form asynchronously to display loaders and handle premium transition
+        uploadForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const formData = new FormData(uploadForm);
+            
+            // Switch panel to Loading state
+            formPanel.style.display = 'none';
+            loadingPanel.style.display = 'flex';
+            
+            // Artificial small delay for the scanning animation effect
+            setTimeout(() => {
+                fetch('/predict', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Falha na resposta do servidor.');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    // Switch loading to results
+                    loadingPanel.style.display = 'none';
+                    resultsPanel.style.display = 'flex';
+                    
+                    // Render result content
+                    resultImgView.src = imgPreview.src;
+                    
+                    // Configure result card style (NORMAL or PNEUMONIA)
+                    resultCardBox.className = 'result-card ' + data.classe;
+                    
+                    if (data.classe === 'NORMAL') {
+                        resultClassBadge.innerHTML = '<i class="fa-solid fa-circle-check"></i> NORMAL';
+                    } else {
+                        resultClassBadge.innerHTML = '<i class="fa-solid fa-circle-exclamation"></i> PNEUMONIA';
+                    }
+                    
+                    const confidencePercent = (data.confianca * 100).toFixed(1) + '%';
+                    resultConfidenceText.textContent = confidencePercent;
+                    
+                    // Smooth delay before bar fill animation
+                    setTimeout(() => {
+                        resultConfidenceBar.style.width = confidencePercent;
+                    }, 200);
+                    
+                    // Mock warning badge
+                    if (data.mock) {
+                        mockBadge.style.display = 'block';
+                    } else {
+                        mockBadge.style.display = 'none';
+                    }
+                })
+                .catch(error => {
+                    console.error('Erro na análise:', error);
+                    alert('Ocorreu um erro no processamento do Raio-X. Certifique-se de iniciar o servidor com o modelo carregado.');
+                    // Reset view to form
+                    loadingPanel.style.display = 'none';
+                    formPanel.style.display = 'block';
+                });
+            }, 1500); // 1.5 seconds scanning effect
+        });
+
+        newAnalysisBtn.addEventListener('click', () => {
+            // Reset form
+            fileInput.value = '';
+            imgPreview.src = '';
+            previewBox.style.display = 'none';
+            dropContent.style.display = 'flex';
+            analyzeBtn.setAttribute('disabled', 'true');
+            resultConfidenceBar.style.width = '0%';
+            
+            // Panel transition
+            resultsPanel.style.display = 'none';
+            formPanel.style.display = 'block';
+        });
+    </script>
+</body>
+</html>
