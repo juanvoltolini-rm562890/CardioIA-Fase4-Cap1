@@ -28,7 +28,7 @@ O sistema cobre o fluxo completo de visao computacional aplicada a saude:
 dataset publico -> pre-processamento -> treino CNN / transfer learning -> avaliacao -> prototipo web e mobile
 ```
 
-### Arquitetura da solucao
+### Arquitetura da solução
 
 ```mermaid
 flowchart LR
@@ -90,7 +90,26 @@ Tambem serao implementados os desafios "Ir Alem":
 
 As pastas marcadas com "Etapa N" serao preenchidas conforme a divisao de trabalho em `docs/plano_de_trabalho.md`.
 
-## Desenvolvimento e Avaliacao dos Modelos
+## Como Executar o Projeto Localmente
+
+Como os arquivos de pesos das redes neurais (`.keras` e `.h5`) são muito grandes para o histórico do Git, estruturamos um script automatizado que busca esses artefatos diretamente dos Releases do repositório.
+
+### 1. Pré-requisitos e Sincronização dos Modelos
+Antes de iniciar a API Flask ou os ambientes de testes, garanta que todas as dependências estejam instaladas e execute o script de sincronização para baixar os modelos de IA:
+
+```bash
+# Instalar as dependências do projeto
+pip install -r requirements.txt
+
+# Baixar os modelos treinados (VGG16 e CNN do Zero) e metadados
+python scripts/download_model.py
+```
+
+### 2. Executando o Servidor (Flask)
+Após o término do download, os arquivos estarão posicionados na pasta models/. Para iniciar o servidor de inferência:
+`python src/flask-app/app.py`
+
+## Desenvolvimento e Avaliação dos Modelos
 
 ### Treinamento da Rede VGG16 (Transfer Learning)
 
