@@ -1,61 +1,33 @@
 import os
-import sys
-import requests
+import urllib.request
 
-def download_file_from_google_drive(file_id, destination):
-    print(f"Iniciando download do modelo do Google Drive (ID: {file_id})...")
-    URL = f"https://drive.usercontent.google.com/download?id={file_id}&export=download&confirm=t"
-    
-    try:
-        response = requests.get(URL, stream=True)
-    except Exception as e:
-        print(f"Erro de conexão ao tentar baixar o arquivo: {e}")
-        return False
-            
-    try:
-        save_response_content(response, destination)
-        print(f"Download concluído com sucesso! Salvo em: {destination}")
-        return True
-    except Exception as e:
-        print(f"Erro ao gravar o arquivo de destino: {e}")
-        return False
-
-def get_confirm_token(response):
-    for key, value in response.cookies.items():
-        if key.startswith('download_warning'):
-            return value
-    return None
-
-def save_response_content(response, destination):
-    CHUNK_SIZE = 32768
-    total_size = 0
-    with open(destination, "wb") as f:
-        for chunk in response.iter_content(CHUNK_SIZE):
-            if chunk:  # filter out keep-alive new chunks
-                f.write(chunk)
-                total_size += len(chunk)
-                # print progress periodically
-                sys.stdout.write(f"\rBaixado: {total_size / (1024*1024):.2f} MB")
-                sys.stdout.flush()
-    print("") # new line
+def download_file(url, destination):
+    if not os.path.exists(destination):
+        print(f"Baixando {os.path.basename(destination)}...")
+        try:
+            urllib.request.urlretrieve(url, destination)
+            print(f"-> {os.path.basename(destination)} baixado com sucesso!")
+        except Exception as e:
+            print(f"Erro ao baixar {os.path.basename(destination)}: {e}")
+    else:
+        print(f"O arquivo {os.path.basename(destination)} já existe localmente.")
 
 if __name__ == "__main__":
-    # ID do arquivo vgg16_finetuned.keras no Google Drive
-    FILE_ID = "1cnCgAeOt1tJvHRd85B_rONsZQ5TFG6En"
+    # Garante a criação apenas da pasta de modelos na raiz
+    os.makedirs("models", exist_ok=True)
     
-    # Caminho de destino
-    script_dir = os.path.dirname(os.path.abspath(__file__))
-    project_root = os.path.dirname(script_dir)
-    dest_dir = os.path.join(project_root, "models")
-    dest_path = os.path.join(dest_dir, "vgg16_finetuned.keras")
+    # URL base apontando para o Release do repositório do grupo
+    repo_url = "https://github.com/juanvoltolini-rm562890/CardioIA-Fase4-Cap1/releases/download/v1.0-modelos"
     
-    if not os.path.exists(dest_dir):
-        os.makedirs(dest_dir)
-        
-    success = download_file_from_google_drive(FILE_ID, dest_path)
-    if not success:
-        print("[ERRO] Falha no download do modelo.")
-        sys.exit(1)
-    else:
-        print("[SUCESSO] Processo de download do modelo concluído.")
-        sys.exit(0)
+    # Lista de arquivos focada na pasta models/
+    arquivos_downloads = [
+        (f"{repo_url}/vgg16_finetuned.keras", "models/vgg16_finetuned.keras"),
+        (f"{repo_url}/model.weights.h5", "models/model.weights.h5"),
+        (f"{repo_url}/metadata.json", "models/metadata.json"),
+        (f"{repo_url}/model_meta.json", "models/model_meta.json")
+    ]
+    
+    print("=== Iniciando o download dos artefatos de IA (CardioIA) ===")
+    for url, dest in arquivos_downloads:
+        download_file(url, dest)
+    print("=== Processo de sincronização concluído! ===")

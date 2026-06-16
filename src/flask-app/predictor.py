@@ -32,11 +32,29 @@ class Predictor:
             try:
                 with open(self.meta_path, "r", encoding="utf-8") as f:
                     meta = json.load(f)
-                self.img_size = tuple(meta.get("img_size", [224, 224]))
-                self.preprocess = meta.get("preprocess", "rescale_255")
-                self.classes = meta.get("classes", ["NORMAL", "PNEUMONIA"])
-                self.threshold = meta.get("threshold", 0.5)
-                print(f"[PREDICTOR] Metadados carregados com sucesso: {meta}")
+                
+                # Suporta o novo formato estruturado por modelo ou o formato antigo plano
+                if "vgg16_transfer_learning" in meta:
+                    vgg_meta = meta["vgg16_transfer_learning"]
+                    input_shape = vgg_meta.get("input_shape", [224, 224, 3])
+                    self.img_size = (input_shape[0], input_shape[1])
+                    
+                    prep = vgg_meta.get("preprocessing", {})
+                    # Se houver rescale, usamos ele. O padrão antigo é "rescale_255"
+                    if "rescale" in prep:
+                        self.preprocess = "rescale_255"
+                    else:
+                        self.preprocess = "rescale_255"
+                        
+                    self.classes = vgg_meta.get("classes", ["NORMAL", "PNEUMONIA"])
+                    self.threshold = vgg_meta.get("threshold", 0.5)
+                else:
+                    self.img_size = tuple(meta.get("img_size", [224, 224]))
+                    self.preprocess = meta.get("preprocess", "rescale_255")
+                    self.classes = meta.get("classes", ["NORMAL", "PNEUMONIA"])
+                    self.threshold = meta.get("threshold", 0.5)
+                
+                print(f"[PREDICTOR] Metadados carregados com sucesso: img_size={self.img_size}, preprocess={self.preprocess}, classes={self.classes}, threshold={self.threshold}")
             except Exception as e:
                 print(f"[PREDICTOR] Erro ao carregar model_meta.json: {e}. Usando padrões.")
         else:
