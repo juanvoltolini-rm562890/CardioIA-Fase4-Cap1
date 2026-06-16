@@ -22,7 +22,8 @@ if __name__ == "__main__":
     # Lista de arquivos focada na pasta models/
     arquivos_downloads = [
         (f"{repo_url}/vgg16_finetuned.keras", "models/vgg16_finetuned.keras"),
-        (f"{repo_url}/cnn_zero.keras", "models/cnn_zero.keras"),
+        (f"{repo_url}/model.weights.h5", "models/model.weights.h5"),
+        (f"{repo_url}/metadata.json", "models/metadata.json"),
         (f"{repo_url}/model_meta.json", "models/model_meta.json")
     ]
     
