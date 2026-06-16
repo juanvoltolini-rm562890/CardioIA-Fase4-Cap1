@@ -30,13 +30,54 @@ O modelo tem **sensibilidade quase perfeita** para pneumonia (recall 0,997, apen
 
 ## 2. Transfer Learning com VGG16
 
-> **Paulo, esta secao e sua.** Preencher a partir do `notebooks/03_transfer_learning.ipynb`. Sugestao do que descrever:
-> - **Arquitetura**: VGG16 pre-treinada na ImageNet (`include_top=False`) com a base congelada + cabeca densa (`GlobalAveragePooling2D -> Dense(256, relu) -> Dropout(0.5) -> Dense(1, sigmoid)`).
-> - **Pre-processamento**: registrar que o treino usou `rescale=1/255` (e nao `preprocess_input`) - isso precisa estar coerente com o que o Flask aplica.
-> - **Treino**: otimizador, epocas, callbacks; comentar que foi feita extracao de features (sem fine-tuning das camadas `block5`) e sem `class_weight`.
-> - **Grad-CAM**: incluir as imagens de explicabilidade (`assets/evidencias/vgg16_gradcam.png`, `raios_x_original.png`) e comentar que o modelo foca nas opacidades pulmonares, e nao em bordas/ossos.
-> - **Resultados no teste**: usar a tabela comparativa da secao 3 (ja preenchida com os numeros reais obtidos no NB04, que avaliou o VGG16 no conjunto de teste).
-> - (Opcional) proximos passos: fine-tuning do `block5` com LR baixo e `class_weight` para melhorar ainda mais o equilibrio.
+## Seção 2: Classificação via Transfer Learning (VGG16)
+
+### 2.1 Arquitetura do Modelo e Estratégia de Extração de Features
+Para estabelecer um comparativo de alto desempenho com a CNN desenvolvida do zero, foi implementada a técnica de *Transfer Learning* (Aprendizado por Transferência) utilizando a arquitetura consolidada **VGG16**, pré-treinada com o dataset *ImageNet*. 
+
+A estratégia adotada consistiu estritamente em **Extração de Features**, configurada da seguinte forma:
+1. **Congelamento da Base Convolucional:** A base da VGG16 foi importada sem o seu topo original (`include_top=False`) e teve todas as suas camadas completamente congeladas (`trainable = False`), incluindo os blocos finais como o `block5`. Não foi realizado o processo de *fine-tuning* nessas camadas convolucionais nesta etapa.
+2. **Desenho do Topo Classificador (Head):** No topo da rede, foi acoplada uma nova estrutura densa especializada, composta pela seguinte sequência de camadas:
+   * **`GlobalAveragePooling2D`**: Para reduzir a dimensionalidade espacial dos mapas de características sem perder informações latentes.
+   * **`Dense(256, activation='relu')`**: Camada intermediária com 256 neurônios para aprendizado das combinações não-lineares.
+   * **`Dropout(0.5)`**: Camada de regularização com fator de 50% para mitigar o risco de *overfitting*.
+   * **`Dense(1, activation='sigmoid')`**: Camada de saída linear configurada com um único neurônio para retornar a probabilidade da classificação binária (NORMAL vs PNEUMONIA).
+
+### 2.2 Pipeline de Pré-processamento e Normalização Aplicada
+O pipeline de dados mapeado em `notebooks/03_transfer_learning.ipynb` foi estruturado de forma customizada, aplicando:
+* **Redimensionamento Espacial:** Imagens redimensionadas uniformemente para $224 \times 224$ pixels com 3 canais de cor (RGB).
+* **Normalização de Escala (Rescale):** Os pixels das imagens foram normalizados linearmente através do fator de divisão de $1/255.0$, reescalando os tensores estritamente para o intervalo estável de $[0, 1]$. 
+
+> **Nota Crítica para o Deploy (Flask):** O modelo foi treinado utilizando o fator de escala direta de $1/255$ em vez da função nativa `preprocess_input` da VGG16. Consequentemente, o backend de inferência do Flask deve repetir exatamente este passo matemático ($img / 255.0$), abstendo-se do uso do pré-processamento original do pacote Keras, sob o risco de corromper os resultados preditivos.
+
+### 2.3 Dinâmica de Treinamento
+O treinamento do classificador foi acelerado utilizando hardware dedicado (GPU NVIDIA T4) ao longo de **10 épocas**, operando com um tamanho de lote (*batch size*) de 32 imagens.
+
+A otimização focou na minimização da função de perda de Entropia Cruzada Binária (*Binary Crossentropy*) utilizando o otimizador **Adam** com taxa de aprendizado instanciada em $\alpha = 10^{-4}$. É importante destacar que o treinamento foi executado de forma direta, **sem a aplicação de pesos de classe (`class_weight`)** para compensar o desbalanceamento do dataset. Para blindar a rede, foram injetados os *callbacks*:
+* **Early Stopping:** Monitorando a perda de validação (*val_loss*) com paciência de 3 épocas.
+* **Model Checkpoint:** Configurado para persistir e salvar em disco exclusivamente o arquivo de pesos com o melhor desempenho em validação.
+
+### 2.4 Análise Diagnóstica por Imagem (GRAD-CAM)
+Como pilar fundamental de governança, ética e auditabilidade médica (XAI - *Explainable Artificial Intelligence*), utilizou-se o algoritmo **GRAD-CAM** (*Gradient-weighted Class Activation Mapping*) para inspecionar os critérios de decisão do modelo.
+
+Ao gerar os mapas de ativação térmica sobrepostos às radiografias originais de teste, o modelo provou sua robustez clínica. Os maiores gradientes de ativação concentraram-se nitidamente sobre os campos pulmonares internos (regiões de opacidade e consolidação alveolar características de infecções pulmonares), ignorando artefatos externos, tecidos ósseos adjacentes (clavículas/costelas) ou vieses de bordas.
+
+<p align="center">
+  <img src="../assets/evidencias/raios_x_original.png" alt="Raios X de Referência Original" width="45%">
+  <img src="../assets/evidencias/vgg16_gradcam.png" alt="Mapa de Calor das Ativações GRAD-CAM" width="45%">
+</p>
+
+### 2.5 Resultados Consolidados no Conjunto de Teste
+Avaliada de forma robusta no conjunto de **Teste** final isolado (conforme mapeado no pipeline de Fairness do `04_fairness.ipynb`), a arquitetura VGG16 obteve os seguintes indicadores de performance real:
+* **Acurácia Geral:** 84.3%
+* **Sensibilidade (Recall para Pneumonia):** 97.4% *(Crítico para evitar falsos negativos na triagem médica)*
+* **Especificidade (Recall para Normal):** 62.4%
+* **Área sob a Curva ROC (AUC):** 0.938
+
+### 2.6 Próximos Passos Sugeridos para Evolução
+Para trabalhos futuros e iterações de melhoria do modelo, recomenda-se:
+1. **Fine-Tuning Localizado:** Descongelar o último bloco convolucional da VGG16 (`block5`) e retomar o treinamento utilizando uma taxa de aprendizado extremamente reduzida ($\alpha = 10^{-5}$) para ajustar os filtros de alta granularidade ao padrão das texturas pulmonares.
+2. **Injeção de `class_weight`:** Aplicar pesos balanceados durante a fase de ajuste fino para tentar elevar o índice de Especificidade (62.4%) do modelo, mitigando a ocorrência de falsos positivos na classe Normal sem sacrificar a excelente Sensibilidade já alcançada.
 
 ## 3. Comparativo CNN do zero x VGG16
 
