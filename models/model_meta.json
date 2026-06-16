@@ -1,0 +1,25 @@
+{
+  "vgg16_transfer_learning": {
+    "model_file": "vgg16_finetuned.keras",
+    "input_shape": [224, 224, 3],
+    "preprocessing": {
+      "rescale": 0.00392156862745098,
+      "use_native_preprocess": false
+    },
+    "classes": ["NORMAL", "PNEUMONIA"],
+    "metrics_test": {
+      "accuracy": 0.843,
+      "recall_pneumonia": 0.974,
+      "specificity": 0.624,
+      "auc": 0.938
+    }
+  },
+  "cnn_from_scratch": {
+    "model_file": "cnn_zero.keras",
+    "input_shape": [150, 150, 1],
+    "preprocessing": {
+      "rescale": 0.00392156862745098
+    },
+    "classes": ["NORMAL", "PNEUMONIA"]
+  }
+}
