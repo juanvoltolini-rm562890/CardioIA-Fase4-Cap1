@@ -7,6 +7,7 @@ data/*
 models/*.keras
 models/*.h5
 models/*.weights.h5
+models/metadata.json
 
 # Python
 __pycache__/
