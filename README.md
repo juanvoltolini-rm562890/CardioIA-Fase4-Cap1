@@ -163,6 +163,29 @@ Devido ao tamanho nominal do arquivo gerado para distribuição comercial, o art
 
 Link para Download do Modelo: [vgg16_finetuned.keras no Google Drive](https://drive.google.com/file/d/1cnCgAeOt1tJvHRd85B_rONsZQ5TFG6En/view?usp=sharing)
 
+## Aplicativo Mobile - Ir Além 2 (React Native / Expo)
+
+O app em `src/mobile/` (Expo / React Native + TypeScript) leva a classificação para o celular: o usuário seleciona uma radiografia de tórax (câmera ou galeria) e recebe a categoria detectada pelo modelo (NORMAL ou PNEUMONIA) com a confiança, consumindo o **mesmo backend Flask** (`POST /api/predict`) pela rede Wi-Fi local. A interface tem identidade visual de "monitor cardíaco" (linha de ECG animada e medidores de confiança) e um aviso fixo de uso acadêmico.
+
+A integração foi validada de ponta a ponta contra o modelo **VGG16 real** (via `curl` no endpoint que o app consome):
+
+| Chamada | Resposta |
+|---|---|
+| `GET /api/health` | `model_loaded: true`, `mock_mode: false` |
+| `POST /api/predict` (radiografia de pneumonia) | `PNEUMONIA` · confiança 0.9766 |
+| `POST /api/predict` (radiografia normal) | `NORMAL` · prob. pneumonia 0.3405 |
+
+**Como rodar (resumo):** suba o backend (`python scripts/download_model.py` e depois `python src/flask-app/app.py`), ajuste `src/mobile/.env` com o IP local da máquina (`EXPO_PUBLIC_USE_MOCK=false`, `EXPO_PUBLIC_API_URL=http://SEU_IP:5050`) e rode `npx expo start -c`, abrindo no Expo Go (celular na mesma Wi-Fi). Passo a passo completo em [`src/mobile/README.md`](src/mobile/README.md).
+
+- Manual detalhado do app: [`src/mobile/README.md`](src/mobile/README.md)
+- Relatório do Ir Além 2: [`docs/relatorio_ir_alem2_mobile.md`](docs/relatorio_ir_alem2_mobile.md)
+- Roteiro do vídeo: [`docs/roteiro_video.md`](docs/roteiro_video.md)
+
+<p align="center">
+  <img src="assets/evidencias/app_mobile_resultado.png" alt="App mobile - resultado PNEUMONIA" width="32%">
+  <img src="assets/evidencias/app_mobile_normal.png" alt="App mobile - resultado NORMAL" width="32%">
+</p>
+
 ## Como executar
 
 ### Parte 1 - Pre-processamento (notebook no Google Colab)
@@ -193,7 +216,7 @@ Link para Download do Modelo: [vgg16_finetuned.keras no Google Drive](https://dr
 
 - Ir Alem 1 (Fairness): Em desenvolvimento através do notebook `04_fairness.ipynb`.
 
-- Ir Alem 2 (Mobile): App mobile Expo React Native localizado em src/mobile/ (Em desenvolvimento).
+- Ir Alem 2 (Mobile): app Expo React Native em `src/mobile/`, integrado ao backend Flask (ver secao "Aplicativo Mobile" acima e `src/mobile/README.md`).
 
 ## Documentacao adicional
 
@@ -206,7 +229,7 @@ Link para Download do Modelo: [vgg16_finetuned.keras no Google Drive](https://dr
 
 - GitHub publico: <https://github.com/juanvoltolini-rm562890/CardioIA-Fase4-Cap1>
 - Notebooks no Colab: abrir os arquivos de `notebooks/` no Google Colab.
-- Link video YouTube nao listado (ate 3 minutos): `[PREENCHER na Etapa 4]`
+- Video (YouTube, ate 3 minutos): <https://youtu.be/MWg5o2Bh_Tg>
 
 ## Evidencias para anexar antes da entrega final
 
@@ -225,9 +248,9 @@ Salvar os prints em `assets/evidencias/` (lista completa em `assets/evidencias/R
 - [x] Prints das metricas de avaliacao.
 - [x] Prototipo de apresentacao dos resultados (Flask web).
 - [ ] Ir Alem 1: relatorio de etica e fairness (+ notebook).
-- [ ] Ir Alem 2: app mobile React Native integrado ao backend + video de ate 3 minutos.
+- [x] Ir Alem 2: app mobile React Native integrado ao backend + video de ate 3 minutos.
 - [ ] Documento mestre seguindo Template FIAP (`document/`).
-- [ ] Links de entrega preenchidos (GitHub e video).
+- [x] Links de entrega preenchidos (GitHub e video).
 
 ## Observacao academica
 
