@@ -1,31 +1,31 @@
-# Faculdade de Informatica e Administracao Paulista
+# Faculdade de Informática e Administração Paulista
 
 <p align="center">
   <img src="assets/logo-fiap.png" alt="FIAP" width="40%">
 </p>
 
-# CardioIA Visao Computacional - Assistente Cardiologico Virtual
+# CardioIA Visão Computacional - Assistente Cardiológico Virtual
 
-**FIAP | Tecnologo em Inteligencia Artificial | Fase 4 | Capitulo 1**
+**FIAP | Tecnólogo em Inteligência Artificial | Fase 4 | Capítulo 1**
 
-## Grupo 72 
+## Grupo 72
 
 | Integrante | GitHub |
 |---|---|
 | Felipe Sabino da Silva | [@FelipeSabinoTMRS](https://github.com/FelipeSabinoTMRS) |
 | Juan Felipe Voltolini | [@juanvoltolini-rm562890](https://github.com/juanvoltolini-rm562890) |
 | Luiz Henrique Ribeiro de Oliveira | [@Luiz-FIAP](https://github.com/Luiz-FIAP) |
-| Marco Aurelio Eberhardt Assumpcao | [@marcofiap](https://github.com/marcofiap) |
+| Marco Aurélio Eberhardt Assumpção | [@marcofiap](https://github.com/marcofiap) |
 | Paulo Henrique Senise | [@PauloSenise](https://github.com/PauloSenise) |
 
-## Descricao
+## Descrição
 
-Este repositorio implementa a fase **CardioIA Visao Computacional**, continuidade do projeto da Fase 3. Na etapa anterior, a CardioIA estruturou o monitoramento continuo de sinais vitais com IoT (ESP32, MQTT e dashboard Node-RED). Nesta fase, a solucao avanca para a analise de imagens medicas com **Deep Learning**: um prototipo que pre-processa radiografias de torax, treina e compara uma **CNN do zero** com **Transfer Learning (VGG16)** e apresenta a classificacao (NORMAL vs PNEUMONIA) em uma interface web Flask e em um app mobile.
+Este repositório implementa a fase **CardioIA Visão Computacional**, continuidade do projeto da Fase 3. Na etapa anterior, a CardioIA estruturou o monitoramento contínuo de sinais vitais com IoT (ESP32, MQTT e dashboard Node-RED). Nesta fase, a solução avança para a análise de imagens médicas com **Deep Learning**: um protótipo que pré-processa radiografias de tórax, treina e compara uma **CNN do zero** com **Transfer Learning (VGG16)** e apresenta a classificação (NORMAL vs PNEUMONIA) em uma interface web Flask e em um app mobile.
 
-O sistema cobre o fluxo completo de visao computacional aplicada a saude:
+O sistema cobre o fluxo completo de visão computacional aplicada à saúde:
 
 ```text
-dataset publico -> pre-processamento -> treino CNN / transfer learning -> avaliacao -> prototipo web e mobile
+dataset público -> pré-processamento -> treino CNN / transfer learning -> avaliação -> protótipo web e mobile
 ```
 
 ### Arquitetura da solução
@@ -33,31 +33,31 @@ dataset publico -> pre-processamento -> treino CNN / transfer learning -> avalia
 ```mermaid
 flowchart LR
     subgraph TREINO [Treino - Google Colab GPU T4]
-        D[(Kaggle<br/>chest-xray-pneumonia)] --> NB1[NB01 Pre-processamento<br/>re-split por paciente]
+        D[(Kaggle<br/>chest-xray-pneumonia)] --> NB1[NB01 Pré-processamento<br/>re-split por paciente]
         NB1 --> NB2[NB02 CNN do zero]
         NB1 --> NB3[NB03 Transfer Learning VGG16]
         NB2 --> M1[(cnn_zero.keras)]
         NB3 --> M2[(vgg16_finetuned.keras<br/>+ model_meta.json)]
-        NB1 --> NB4[NB04 Fairness - Ir Alem 1]
+        NB1 --> NB4[NB04 Fairness - Ir Além 1]
         NB3 --> NB4
     end
 
-    subgraph BACKEND [Inferencia local - Flask]
-        M2 --> FL[app Flask porta 5050<br/>pagina web + POST /api/predict]
+    subgraph BACKEND [Inferência local - Flask]
+        M2 --> FL[app Flask porta 5050<br/>página web + POST /api/predict]
     end
 
     subgraph CLIENTES [Interfaces]
         W[Navegador<br/>upload de raio-X] --> FL
-        A[App Expo React Native<br/>Ir Alem 2] --> FL
+        A[App Expo React Native<br/>Ir Além 2] --> FL
     end
 ```
 
-O dataset escolhido foi o **Chest X-Ray Pneumonia** (Kaggle `paultimothymooney/chest-xray-pneumonia`), com 5.856 radiografias de torax pediatricas rotuladas como NORMAL ou PNEUMONIA (subtipos bacteria e virus). A escolha e justificada no relatorio da Parte 1.
+O dataset escolhido foi o **Chest X-Ray Pneumonia** (Kaggle `paultimothymooney/chest-xray-pneumonia`), com 5.856 radiografias de tórax pediátricas rotuladas como NORMAL ou PNEUMONIA (subtipos bactéria e vírus). A escolha é justificada no relatório da Parte 1.
 
-Tambem serao implementados os desafios "Ir Alem":
+Também foram implementados os desafios "Ir Além":
 
-- **Ir Alem 1**: analise de etica e fairness do dataset e do modelo (vies, desbalanceamento, subgrupos bacteria/virus).
-- **Ir Alem 2**: app mobile em React Native (Expo) com upload de imagem, integrado ao backend Flask.
+- **Ir Além 1**: análise de ética e fairness do dataset e do modelo (viés, desbalanceamento, subgrupos bactéria/vírus).
+- **Ir Além 2**: app mobile em React Native (Expo) com upload de imagem, integrado ao backend Flask.
 
 ## Estrutura de pastas
 
@@ -65,48 +65,46 @@ Tambem serao implementados os desafios "Ir Alem":
 .
 |-- assets/
 |   |-- logo-fiap.png
-|   `-- evidencias/
-|       `-- README.md
+|   `-- evidencias/            # prints das métricas, Grad-CAM e telas do app
 |-- data/
 |   |-- README.md
-|   `-- splits/              # manifestos CSV do re-split (gerados pelo NB01)
-|-- docs/
-|   |-- plano_de_trabalho.md # divisao de tarefas entre os 5 integrantes
-|   `-- relatorio_parte1_preprocessamento.md
-|-- document/
-|   `-- (documento mestre FIAP - Etapa 4)
+|   `-- splits/                # manifestos CSV do re-split (gerados pelo NB01)
+|-- docs/                      # relatórios das Partes 1 e 2, Ir Além 1 e 2, roteiro do vídeo
 |-- models/
-|   `-- README.md            # como obter os modelos .keras (GitHub Release/Drive)
+|   `-- README.md              # como obter os modelos .keras (GitHub Release)
 |-- notebooks/
 |   |-- 01_preprocessamento.ipynb
-|   `-- 03_transfer_learning.ipynb
+|   |-- 02_cnn_do_zero.ipynb
+|   |-- 03_transfer_learning.ipynb
+|   `-- 04_fairness.ipynb
 |-- scripts/
-|   `-- (download_model.py e test_api.sh - Etapas 2 e 3)
+|   |-- download_model.py
+|   `-- test_api.py
 |-- src/
-|   |-- flask-app/           # prototipo web + API REST (Etapa 2)
-|   `-- mobile/              # app Expo React Native (Etapa 2)
+|   |-- flask-app/             # protótipo web + API REST
+|   `-- mobile/                # app Expo React Native (Ir Além 2)
 `-- README.md
 ```
 
-As pastas marcadas com "Etapa N" serao preenchidas conforme a divisao de trabalho em `docs/plano_de_trabalho.md`.
+A estrutura segue a divisão de trabalho descrita em `docs/plano_de_trabalho.md`.
 
 ## Como Executar o Projeto Localmente
 
 Como os arquivos de pesos das redes neurais (`.keras` e `.h5`) são muito grandes para o histórico do Git, estruturamos um script automatizado que busca esses artefatos diretamente dos Releases do repositório.
 
-### 1. Pré-requisitos e Sincronização dos Modelos
-Antes de iniciar a API Flask ou os ambientes de testes, garanta que todas as dependências estejam instaladas e execute o script de sincronização para baixar os modelos de IA:
+### 1. Pré-requisitos e sincronização dos modelos
+Antes de iniciar a API Flask ou os ambientes de teste, garanta que todas as dependências estejam instaladas e execute o script de sincronização para baixar os modelos de IA:
 
 ```bash
 # Instalar as dependências do projeto
 pip install -r requirements.txt
 
-# Baixar os modelos treinados (VGG16 e CNN do Zero) e metadados
+# Baixar os modelos treinados (VGG16 e CNN do zero) e metadados
 python scripts/download_model.py
 ```
 
-### 2. Executando o Servidor (Flask)
-Após o término do download, os arquivos estarão posicionados na pasta models/. Para iniciar o servidor de inferência:
+### 2. Executando o servidor (Flask)
+Após o término do download, os arquivos estarão posicionados na pasta `models/`. Para iniciar o servidor de inferência:
 `python src/flask-app/app.py`
 
 ## Desenvolvimento e Avaliação dos Modelos
@@ -129,7 +127,7 @@ O classificador atingiu estabilidade plena com convergência mútua e limpa entr
 </p>
 
 ```text
-Relatório Técnico de Classification:
+Relatório Técnico de Classificação:
               precision    recall  f1-score   support
 
       NORMAL       0.81      0.90      0.85       135
@@ -159,7 +157,7 @@ O mapeamento gerou representações térmicas visuais que atestam cientificament
 
 ### Repositório do Arquivo de Pesos (.keras)
 
-Devido ao tamanho nominal do arquivo gerado para distribuição comercial, o artefato de pesos binários foi devidamente indexado e salvo de forma externa:
+Devido ao tamanho do arquivo gerado, o artefato de pesos binários foi indexado e salvo de forma externa:
 
 Link para Download do Modelo: [vgg16_finetuned.keras no Google Drive](https://drive.google.com/file/d/1cnCgAeOt1tJvHRd85B_rONsZQ5TFG6En/view?usp=sharing)
 
@@ -186,72 +184,75 @@ A integração foi validada de ponta a ponta contra o modelo **VGG16 real** (via
   <img src="assets/evidencias/app_mobile_normal.png" alt="App mobile - resultado NORMAL" width="32%">
 </p>
 
-## Como executar
+## Como executar (notebooks no Google Colab)
 
-### Parte 1 - Pre-processamento (notebook no Google Colab)
+### Parte 1 - Pré-processamento
 
-1. Abra `notebooks/01_preprocessamento.ipynb` no Google Colab (botao "Open in Colab" no proprio notebook ou upload manual).
+1. Abra `notebooks/01_preprocessamento.ipynb` no Google Colab (botão "Open in Colab" no próprio notebook ou upload manual).
 
-2. Selecione um runtime com GPU (Runtime > Change runtime type > T4 GPU). A GPU nao e obrigatoria na Parte 1, mas mantem o ambiente identico ao dos notebooks de treino.
+2. Selecione um runtime com GPU (Runtime > Change runtime type > T4 GPU). A GPU não é obrigatória na Parte 1, mas mantém o ambiente idêntico ao dos notebooks de treino.
 
 3. Execute `Runtime > Run all`. O notebook executará a análise exploratória, efetuará o re-split 90/10 por paciente e gerará os arquivos train.csv, val.csv e test.csv.
 
-4. Copie os tres CSVs baixados para `data/splits/` e faca commit. Os notebooks 02, 03 e 04 leem esses manifestos para garantir que todos usem exatamente o mesmo split.
+4. Copie os três CSVs baixados para `data/splits/` e faça commit. Os notebooks 02, 03 e 04 leem esses manifestos para garantir que todos usem exatamente o mesmo split.
 
-### Parte 2 - Treinamento do Modelo de Transfer Learning (VGG16)
+### Parte 2 - Treinamento dos Modelos (CNN do zero e Transfer Learning VGG16)
 
 1. Certifique-se de possuir os manifestos gerados na Parte 1 localizados na estrutura `data/splits/`.
 
-2. Abra o arquivo `notebooks/03_transfer_learning.ipynb` no Google Colab.
+2. Abra `notebooks/02_cnn_do_zero.ipynb` (CNN do zero) e `notebooks/03_transfer_learning.ipynb` (VGG16) no Google Colab.
 
 3. Configure o ambiente de hardware com aceleração por GPU (Runtime > Change runtime type > T4 GPU).
 
-4. Execute todas as células `Runtime > Run all`. O script efetuará a carga de dados equilibrada, o pipeline de transfer learning, a plotagem automática das curvas de erro/acurácia, a exibição da matriz de confusão correspondente e a renderização final das imagens do teste anatomico pelo GRAD-CAM.
+4. Execute todas as células `Runtime > Run all`. Os notebooks efetuam a carga de dados equilibrada, o treino, a plotagem das curvas de erro/acurácia, a matriz de confusão e, no VGG16, a renderização final das imagens do teste anatômico pelo GRAD-CAM.
 
-### Parte 3 - CNN do Zero, Prototipo Flask e Interfaces
+### Parte 3 - Status dos componentes
 
-- CNN do Zero `02_cnn_do_zero.ipynb`: Em desenvolvimento. Seguirá o mesmo fluxo de execução do pipeline configurado no Colab.
+- CNN do Zero (`notebooks/02_cnn_do_zero.ipynb`): **concluída** - treinada e avaliada no conjunto de teste (curvas de treino, matriz de confusão e ROC em `assets/evidencias/`).
 
-- Backend Flask: Concluído e totalmente funcional na branch `flask` (Passo 4). O protótipo Flask roda localmente na porta 5050 consumindo o modelo VGG16 treinado no Google Colab, oferecendo um painel web premium e endpoint REST `/api/predict` integrado para o app mobile.
+- Backend Flask (`src/flask-app/`): **concluído** - roda localmente na porta 5050, consome o modelo VGG16 treinado no Colab e oferece um painel web e o endpoint REST `/api/predict` integrado ao app mobile.
 
-- Ir Alem 1 (Fairness): Em desenvolvimento através do notebook `04_fairness.ipynb`.
+- Ir Além 1 (Fairness): **concluído** - notebook `notebooks/04_fairness.ipynb` e relatório `docs/relatorio_ir_alem1_fairness.md`.
 
-- Ir Alem 2 (Mobile): app Expo React Native em `src/mobile/`, integrado ao backend Flask (ver secao "Aplicativo Mobile" acima e `src/mobile/README.md`).
+- Ir Além 2 (Mobile): **concluído** - app Expo React Native em `src/mobile/`, integrado ao backend Flask (ver seção "Aplicativo Mobile" acima e `src/mobile/README.md`).
 
-## Documentacao adicional
+## Documentação adicional
 
-- `docs/plano_de_trabalho.md` - plano completo da fase, com divisao de tarefas, dependencias e riscos.
-- `docs/relatorio_parte1_preprocessamento.md` - relatorio da Parte 1 (dataset, re-split e pipeline).
+- `docs/plano_de_trabalho.md` - plano completo da fase, com divisão de tarefas, dependências e riscos.
+- `docs/relatorio_parte1_preprocessamento.md` - relatório da Parte 1 (dataset, re-split e pipeline).
+- `docs/relatorio_parte2_cnn_transfer_learning.md` - relatório da Parte 2 (CNN do zero e Transfer Learning VGG16).
+- `docs/relatorio_ir_alem1_fairness.md` - relatório do Ir Além 1 (ética e fairness).
+- `docs/relatorio_ir_alem2_mobile.md` - relatório do Ir Além 2 (app mobile).
 - `data/README.md` - como obter o dataset e o papel dos manifestos de split.
 - `models/README.md` - como obter os modelos treinados.
 
 ## Links para entrega
 
-- GitHub publico: <https://github.com/juanvoltolini-rm562890/CardioIA-Fase4-Cap1>
+- GitHub público: <https://github.com/juanvoltolini-rm562890/CardioIA-Fase4-Cap1>
 - Notebooks no Colab: abrir os arquivos de `notebooks/` no Google Colab.
-- Video (YouTube, ate 3 minutos): <https://youtu.be/MWg5o2Bh_Tg>
+- Vídeo (YouTube, até 3 minutos): <https://youtu.be/MWg5o2Bh_Tg>
 
-## Evidencias para anexar antes da entrega final
+## Evidências
 
-Salvar os prints em `assets/evidencias/` (lista completa em `assets/evidencias/README.md`).
+Prints salvos em `assets/evidencias/` (lista completa em `assets/evidencias/README.md`).
 
 ## Checklist do enunciado
 
-- [x] Dataset publico de imagens medicas selecionado (Chest X-Ray Pneumonia, Kaggle).
-- [x] Pipeline de pre-processamento: redimensionamento, normalizacao e conversao de formatos.
-- [x] Criacao de conjuntos de treino, validacao e teste (re-split por paciente).
-- [x] Notebook Python (Google Colab) com o codigo de pre-processamento.
-- [x] Relatorio curto da Parte 1 com etapas e justificativas.
-- [ ] CNN simples treinada do zero com avaliacao completa.
+- [x] Dataset público de imagens médicas selecionado (Chest X-Ray Pneumonia, Kaggle).
+- [x] Pipeline de pré-processamento: redimensionamento, normalização e conversão de formatos.
+- [x] Criação de conjuntos de treino, validação e teste (re-split por paciente).
+- [x] Notebook Python (Google Colab) com o código de pré-processamento.
+- [x] Relatório curto da Parte 1 com etapas e justificativas.
+- [x] CNN simples treinada do zero com avaliação completa.
 - [x] Transfer Learning funcional (VGG16) com comparativo.
-- [x] Metricas: acuracia, matriz de confusao, precisao, recall, F1-score.
-- [x] Prints das metricas de avaliacao.
-- [x] Prototipo de apresentacao dos resultados (Flask web).
-- [ ] Ir Alem 1: relatorio de etica e fairness (+ notebook).
-- [x] Ir Alem 2: app mobile React Native integrado ao backend + video de ate 3 minutos.
+- [x] Métricas: acurácia, matriz de confusão, precisão, recall, F1-score.
+- [x] Prints das métricas de avaliação.
+- [x] Protótipo de apresentação dos resultados (Flask web e app mobile).
+- [x] Ir Além 1: relatório de ética e fairness (+ notebook).
+- [x] Ir Além 2: app mobile React Native integrado ao backend + vídeo de até 3 minutos.
 - [ ] Documento mestre seguindo Template FIAP (`document/`).
-- [x] Links de entrega preenchidos (GitHub e video).
+- [x] Links de entrega preenchidos (GitHub e vídeo).
 
-## Observacao academica
+## Observação acadêmica
 
-Este projeto e uma simulacao academica com dados publicos. O dataset e composto por radiografias pediatricas de uma unica instituicao, e as classificacoes geradas pelos modelos nao substituem avaliacao medica, validacao clinica, certificacao regulatoria ou protocolos reais de diagnostico.
+Este projeto é uma simulação acadêmica com dados públicos. O dataset é composto por radiografias pediátricas de uma única instituição, e as classificações geradas pelos modelos não substituem avaliação médica, validação clínica, certificação regulatória ou protocolos reais de diagnóstico.
