@@ -161,6 +161,15 @@ Devido ao tamanho do arquivo gerado, o artefato de pesos binários foi indexado 
 
 Link para Download do Modelo: [vgg16_finetuned.keras no Google Drive](https://drive.google.com/file/d/1cnCgAeOt1tJvHRd85B_rONsZQ5TFG6En/view?usp=sharing)
 
+## Protótipo Web (Flask)
+
+O backend Flask (`src/flask-app/`) também serve uma página web de classificação: o usuário faz upload de uma radiografia de tórax e recebe o resultado (classe + grau de confiança), consumindo o modelo **VGG16 real**. O mesmo servidor expõe o endpoint REST `POST /api/predict` usado pelo app mobile. Para executar, ver a seção "Como Executar o Projeto Localmente".
+
+<p align="center">
+  <img src="assets/evidencias/flask_web.png" alt="Flask web - resultado PNEUMONIA (97,7%)" width="48%">
+  <img src="assets/evidencias/flask_web_normal.png" alt="Flask web - resultado NORMAL (66%)" width="48%">
+</p>
+
 ## Aplicativo Mobile - Ir Além 2 (React Native / Expo)
 
 O app em `src/mobile/` (Expo / React Native + TypeScript) leva a classificação para o celular: o usuário seleciona uma radiografia de tórax (câmera ou galeria) e recebe a categoria detectada pelo modelo (NORMAL ou PNEUMONIA) com a confiança, consumindo o **mesmo backend Flask** (`POST /api/predict`) pela rede Wi-Fi local. A interface tem identidade visual de "monitor cardíaco" (linha de ECG animada e medidores de confiança) e um aviso fixo de uso acadêmico.
@@ -250,7 +259,7 @@ Prints salvos em `assets/evidencias/` (lista completa em `assets/evidencias/READ
 - [x] Protótipo de apresentação dos resultados (Flask web e app mobile).
 - [x] Ir Além 1: relatório de ética e fairness (+ notebook).
 - [x] Ir Além 2: app mobile React Native integrado ao backend + vídeo de até 3 minutos.
-- [ ] Documento mestre seguindo Template FIAP (`document/`).
+- [x] Documento mestre seguindo Template FIAP (entregue na plataforma FIAP).
 - [x] Links de entrega preenchidos (GitHub e vídeo).
 
 ## Observação acadêmica
